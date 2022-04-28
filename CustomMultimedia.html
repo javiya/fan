@@ -206,5 +206,19 @@
   })
 
     // 点击静音
-    
+    $('.volume i').click(function(){
+    if ($(this).hasClass('icon-sound-on')) {
+      // 静音
+      media.muted = true;
+      $(this).removeClass('icon-sound-on').addClass('icon-sound-off');
+      $('.currentVolume').css('height',0);
+      $('.volumeBtn').css('bottom',-7);
+    } else {
+      media.muted = false;
+      $(this).removeClass('icon-sound-off').addClass('icon-sound-on');
+      $('.currentVolume').css('height',50);
+      $('.volumeBtn').css('bottom',43);
+      media.volume = 0.5;      
+    }
+  })
 </script>
