@@ -65,6 +65,7 @@
       position: absolute;
       top: -100px;
       left: 10px;
+      padding-right: 4px;
       display: none;
     }
 
@@ -76,6 +77,7 @@
       position: absolute;
       left: 0;
       bottom: 0;
+      pointer-events: none;
     }
 
     .media .volumeRange .volumeBtn {
@@ -86,6 +88,7 @@
       position: absolute;
       left: -5px;
       bottom: 40px;
+      pointer-events: none;
     }
 
     .media i {
@@ -205,20 +208,67 @@
     })
   })
 
-    // 点击静音
-    $('.volume i').click(function(){
-    if ($(this).hasClass('icon-sound-on')) {
+  // 点击静音
+  // 给volume下的i标签绑定点击事件 实现静音
+  $('.volume i').click(function(){
+    // 判断i标签的音量状态
+    if($(this).hasClass('icon-sound-on')){
       // 静音
       media.muted = true;
       $(this).removeClass('icon-sound-on').addClass('icon-sound-off');
       $('.currentVolume').css('height',0);
-      $('.volumeBtn').css('bottom',-7);
-    } else {
+      $('.volumeBtn').css('top',93)
+    }else{  //点击实现不静音
       media.muted = false;
       $(this).removeClass('icon-sound-off').addClass('icon-sound-on');
-      $('.currentVolume').css('height',50);
-      $('.volumeBtn').css('bottom',43);
-      media.volume = 0.5;      
+      console.log(vol);
+      console.log($('.volumeRange').height());
+      $('.currentVolume').css('height', vol * $('.volumeRange').height());
+      $('.volumeBtn').css('top', (1-vol) * $('.volumeRange').height() - 7);
     }
   })
+
+  // 拖拽音量
+  $('.volumeRange').mousedown(function(e){
+    // 获取到点击的y的值 设置volumeBtn和volumeRange的位置
+    let y = e.offsetY;
+    $('.volumeBtn').css('top',y-7);
+    $('.currentVolume').css('height',$(this).height() - y);
+    // 设置音量
+    let percent = 1 - y / $(this).height();
+    media.volume = percent;
+    // 判断设置音量时音量是否为0 进行图标切换
+    if(percent <= 0.3) $('.volume i').removeClass('icon-sound-on').addClass('icon-sound-off');
+    else  $('.volume i').removeClass('icon-sound-off').addClass('icon-sound-on');
+
+    // 点击之后实现拖拽音量  添加鼠标移动世间
+    $('.volumeRange').mousemove(function (e) {
+      // 获取到点击的y的值 设置volumeBtn和volumeRange的位置
+      let y = e.offsetY;
+      $('.volumeBtn').css('top', y - 7);
+      $('.currentVolume').css('height', $(this).height() - y);
+      // 设置音量
+      let percent = 1 - y / $(this).height();
+      media.volume = percent;
+      // 判断设置音量时音量是否为0 进行图标切换
+      if (percent <= 0.01) $('.volume i').removeClass('icon-sound-on').addClass('icon-sound-off');
+      else $('.volume i').removeClass('icon-sound-off').addClass('icon-sound-on');
+    })
+  })
+
+  // 取消事件
+  $(document).mouseup(function(){
+    // 记录音量
+    vol = media.volume;
+    $('.volumeRange').off('mousemove')
+  })
+
+  // 阻止默认选中事件
+  $('.media')[0].onselectstart = function(e){
+    e.preventDefault();
+  }
+
+  // $('.media')[0].onselectstart = function (e) {
+  //   e.preventDefault();
+  // }
 </script>
